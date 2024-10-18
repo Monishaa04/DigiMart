@@ -1,0 +1,38 @@
+/* src/components/Header.module.css */
+.header {
+    background-color: #f9f3f6; /* Blue 600 */
+    color: #191818; /* White */
+    padding: 1rem; /* py-4 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* shadow-lg */
+    width: 100%; /* w-screen */
+    
+}
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px; /* This may be adjusted according to your design */
+    margin: 0 auto; /* Center the container */
+    padding-left: 1rem; /* px-4 */
+    padding-right: 1rem; /* px-4 */
+}
+
+.title {
+    font-size: 1.5rem; /* text-2xl */
+    font-weight: bold; /* font-bold */
+}
+
+.navList {
+    display: flex;
+    gap: 1.5rem; /* space-x-6 */
+}
+
+.navItem {
+    color: #100f0f; /* White */
+    text-decoration: none;
+}
+
+.navItem:hover {
+    color: #131313; /* Gray 200 */
+}

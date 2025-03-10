@@ -15,8 +15,8 @@ const Home = () => {
     const fetchProducts = async () => {
       try {
         const endpoint = selectedCategory === 'All'
-          ? 'http://localhost:5000/api/products'
-          : `http://localhost:5000/api/products/category/${selectedCategory}`;
+          ? 'http://localhost:8000/api/products'
+          : `http://localhost:8000/api/products/category/${selectedCategory}`;
         const response = await axios.get(endpoint);
         setProducts(response.data);
       } catch (error) {

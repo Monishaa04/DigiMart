@@ -8,7 +8,7 @@ const SearchBar = ({ onSearchResults }) => {
 
   const handleSearch = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/products/search', { params: { query } });
+      const response = await axios.get('http://localhost:8000/api/products/search', { params: { query } });
       onSearchResults(response.data);
     } catch (error) {
       console.error('Error fetching search results:', error);

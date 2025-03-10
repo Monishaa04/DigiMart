@@ -10,7 +10,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/users/login', { email, password });
+      await axios.post('http://localhost:8000/api/users/login', { email, password });
       window.location.href = '/payment'; // Redirect to payment page on successful login
     } catch (err) {
       setError('Login failed');

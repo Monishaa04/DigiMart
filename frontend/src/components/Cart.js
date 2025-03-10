@@ -1,40 +1,49 @@
+// components/Cart.js
 import React, { useEffect, useState } from 'react';
-import { useCart } from '../context/CartContext';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext'; // Assuming you have this context
-import '../styles/Cart.css'; // Import the CSS file
-import { motion } from 'framer-motion';
 
 const Cart = () => {
-  const { getCartItems, removeFromCart } = useCart();
-  const { isAuthenticated } = useAuth(); // Check if the user is authenticated
-  const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const items = getCartItems();
-    setCartItems(items);
-  }, [getCartItems]);
+    const fetchCartItems = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('/api/cart', {
+          headers: { Authorization: token }
+        });
+        setCartItems(response.data.items);  // Update state with cart items
+      } catch (error) {
+        console.error('Error fetching cart:', error);
+      }
+    };
+    fetchCartItems();
+  }, []);
 
-  const handleRemove = (id) => {
-    removeFromCart(id);
-    setCartItems(prevItems => prevItems.filter(item => item._id !== id));
+  const handleRemove = async (productId) => {
+    try {
+      const token = localStorage.getItem('token'); // Assumes token is stored in local storage
+      await axios.delete(`/api/cart/remove/${productId}`, {
+        headers: { Authorization: token },
+      });
+      
+      // Update cartItems in state after successful removal
+      setCartItems((prevItems) => prevItems.filter((item) => item.productId._id !== productId));
+      alert('Item removed from cart');
+    } catch (error) {
+      console.error('Error removing item from cart:', error);
+      alert('Failed to remove item from cart');
+    }
   };
 
   const getTotalAmount = () => {
-    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
-  };
-
-  const getTotalQuantity = () => {
-    return cartItems.reduce((total, item) => total + item.quantity, 0);
+    return cartItems.reduce((total, item) => total + item.productId.price * item.quantity, 0).toFixed(2);
   };
 
   const handleProceedToPay = () => {
-    if (isAuthenticated) {
-      navigate('/payment'); // Redirect to payment page if authenticated
-    } else {
-      navigate('/register'); // Redirect to registration page if not authenticated
-    }
+    navigate('/payment');  // Redirect to payment page
   };
 
   return (
@@ -44,59 +53,22 @@ const Cart = () => {
         <p>Your cart is empty</p>
       ) : (
         <div>
-          <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            {cartItems.map(item => (
-              <motion.div
-                key={item._id}
-                className="cart-item"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
-              >
-                <img src={item.imageUrl} alt={item.name} />
-                <h2>{item.name}</h2>
-                <p>{item.description}</p>
-                <p>Quantity: {item.quantity}</p>
-                <p>Price: {item.price * item.quantity}</p>
-                <motion.button
-                  onClick={() => handleRemove(item._id)}
-                  className="remove-button"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Remove
-                </motion.button>
-              </motion.div>
-            ))}
-          </motion.div>
-          <motion.div
-            className="summary"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="summary-item">
-              <span>Total Quantity:</span>
-              <span>{getTotalQuantity()}</span>
+          {cartItems.map(item => (
+            <div key={item.productId._id} className="cart-item">
+              <img src={item.productId.imageUrl} alt={item.productId.name} />
+              <h2>{item.productId.name}</h2>
+              <p>Quantity: {item.quantity}</p>
+              <p>Price: {item.productId.price * item.quantity}</p>
+              <button onClick={() => handleRemove(item.productId._id)}>Remove</button>
             </div>
+          ))}
+          <div className="summary">
             <div className="summary-item">
               <span>Total Amount:</span>
               <span>{getTotalAmount()}</span>
             </div>
-            <motion.button
-              className="proceed-button"
-              onClick={handleProceedToPay}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Proceed to Pay
-            </motion.button>
-          </motion.div>
+            <button onClick={handleProceedToPay}>Proceed to Pay</button>
+          </div>
         </div>
       )}
     </div>
